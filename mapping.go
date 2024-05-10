@@ -390,13 +390,9 @@ func (m *PropertyMapping) GetProperty(field string) (map[string]*Property, error
 	return res, nil
 }
 
-func LoadMappingData(mappingData []byte) (*PropertyMapping, error) {
-	var fieldMapping = &Mapping{}
-	if err := jsoniter.Unmarshal(mappingData, fieldMapping); err != nil {
-		return nil, fmt.Errorf("failed to parser mapping data: %s, err: %s", mappingData, err)
-	}
+func NewPropertyMapping(mapping *Mapping) (*PropertyMapping, error) {
 	var pm = &PropertyMapping{
-		fieldMapping:  fieldMapping,
+		fieldMapping:  mapping,
 		fieldAliasMap: map[string]string{},
 		propertyCache: map[string]*Property{},
 	}
@@ -407,6 +403,14 @@ func LoadMappingData(mappingData []byte) (*PropertyMapping, error) {
 		pm.fieldAliasMap = fieldAliasMap
 	}
 	return pm, nil
+}
+
+func LoadMappingData(mappingData []byte) (*PropertyMapping, error) {
+	var fieldMapping = &Mapping{}
+	if err := jsoniter.Unmarshal(mappingData, fieldMapping); err != nil {
+		return nil, fmt.Errorf("failed to parser mapping data: %s, err: %s", mappingData, err)
+	}
+	return NewPropertyMapping(fieldMapping)
 }
 
 func LoadMappingFile(mappingPath string) (*PropertyMapping, error) {
